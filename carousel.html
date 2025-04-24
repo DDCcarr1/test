@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sliding Image Carousel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+
+        #carousel {
+            width: 600px;
+            height: 400px;
+            overflow: hidden;
+            position: relative;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+        }
+
+        #carousel img {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            transition: transform 1s ease-in-out, opacity 1s ease-in-out;
+            transform: translateX(100%);
+            opacity: 0;
+        }
+
+        #carousel img.active {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        #carousel img.exit-left {
+            transform: translateX(-100%);
+            opacity: 0;
+        }
+
+        #carousel img.exit-right {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+
+        .nav-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        .nav-button.left {
+            left: 10px;
+        }
+
+        .nav-button.right {
+            right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="carousel">
+        <!-- Replace these URLs with your own image links -->
+        <img src="https://via.placeholder.com/600x400?text=Image+1" alt="Image 1" class="active">
+        <img src="https://via.placeholder.com/600x400?text=Image+2" alt="Image 2">
+        <img src="https://via.placeholder.com/600x400?text=Image+3" alt="Image 3">
+
+        <!-- Navigation buttons -->
+        <button class="nav-button left" id="left-button">&lt;</button>
+        <button class="nav-button right" id="right-button">&gt;</button>
+    </div>
+
+    <script>
+        const images = document.querySelectorAll('#carousel img');
+        const leftButton = document.getElementById('left-button');
+        const rightButton = document.getElementById('right-button');
+        let currentIndex = 0;
+        let autoCycleTimeout;
+
+        function updateActiveImage(direction = 'right') {
+            const currentImage = images[currentIndex];
+            currentImage.classList.remove('active');
+
+            if (direction === 'left') {
+                currentImage.classList.add('exit-right'); // Slide out to the right
+            } else {
+                currentImage.classList.add('exit-left'); // Slide out to the left
+            }
+
+            setTimeout(() => {
+                currentImage.classList.remove('exit-right', 'exit-left');
+            }, 1000); // Match the duration of the transition
+
+            if (direction === 'left') {
+                currentIndex = (currentIndex - 1 + images.length) % images.length;
+            } else {
+                currentIndex = (currentIndex + 1) % images.length;
+            }
+
+            const nextImage = images[currentIndex];
+            nextImage.classList.add('active');
+        }
+
+        function cycleImages(direction = 'right') {
+            updateActiveImage(direction);
+            resetAutoCycle();
+        }
+
+        function resetAutoCycle() {
+            clearTimeout(autoCycleTimeout);
+            autoCycleTimeout = setTimeout(() => {
+                cycleImages('right');
+            }, 5000); // Resume auto-cycle after 5 seconds
+        }
+
+        leftButton.addEventListener('click', () => {
+            cycleImages('left');
+        });
+
+        rightButton.addEventListener('click', () => {
+            cycleImages('right');
+        });
+
+        // Initial automatic cycling every 5 seconds
+        autoCycleTimeout = setTimeout(() => {
+            cycleImages('right');
+        }, 5000);
+    </script>
+</body>
+</html>
